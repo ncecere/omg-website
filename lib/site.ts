@@ -15,7 +15,7 @@ export const site = {
   version: "v0.3.0",
   // The release day of `version` (the footer and the sitemap show it). Null
   // until the tag exists; set it the day v0.3.0 is tagged.
-  releaseDate: null as string | null,
+  releaseDate: "2026-10-09" as string | null,
   releaseNotesUrl: `${repoUrl}/releases/tag/v0.3.0`,
   releasesUrl: `${repoUrl}/releases`,
   licenseUrl: `${tag}/LICENSE`,

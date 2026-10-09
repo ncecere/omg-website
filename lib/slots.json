@@ -1,14 +1,15 @@
 {
   "admin-usage": {
-    "alt": "Admin › Usage in Open Model Gateway: spend for the period split into settled cost, active holds and requests with unknown cost, with totals per Team and Project and per model.",
-    "caption": "Usage and costs in exact micro-dollars. Holds and unknown costs are shown as such, never as zero."
+    "alt": "Admin › Usage in Open Model Gateway: spend for the month with the amount on hold and a link to requests with unknown cost, requests and tokens, the installation's monthly budget, and spend per day.",
+    "caption": "Usage and costs in exact micro-dollars. Holds and unknown costs are shown as such, never as zero.",
+    "file": "admin-usage-overview"
   },
   "admin-limits": {
-    "alt": "Admin › Settings › Defaults & limits: the installation ceiling and the Personal, Team and Project defaults, each with daily, weekly and monthly budgets, requests and tokens per minute, requests at once, jobs at once and storage.",
+    "alt": "Admin › Settings › Defaults & limits, Team default: requests and tokens per minute, requests at once, jobs at once, storage and a monthly budget, with tabs for the installation ceiling and the Personal and Project defaults.",
     "caption": "Budgets and limits stack: installation, workspace type, workspace and key. Every layer that applies is enforced."
   },
   "workspace-models": {
-    "alt": "Workspace › Models: the models this workspace can use, each with its API name, the protocols it serves and its configured prices.",
+    "alt": "Workspace › Models: the models this workspace can use, each with its API name, type, serving state and configured prices, two of them ticked for comparison.",
     "caption": "Each workspace sees the models its catalogs and direct assignments allow, and nothing else."
   },
   "workspace-keys": {
@@ -16,7 +17,7 @@
     "caption": "Keys belong to one workspace, carry their own limits and models, and are shown once."
   },
   "workspace-logs": {
-    "alt": "Workspace › Logs › Requests: a list of requests with time, model, provider, status, tokens, time to first token and cost, above summary figures for the period.",
+    "alt": "Workspace › Logs › Requests: summary figures for the period above a list of requests with time, model, key and app, tokens, cost, latency, time to first token and speed.",
     "caption": "Logs keep request metadata: model, status, tokens, timing and cost. Never prompts or responses."
   },
   "admin-connections": {
@@ -28,7 +29,7 @@
     "caption": "The key safety audit finds keys with no expiry, no limits, an absent holder or no recent use, and offers the fix."
   },
   "batch-detail": {
-    "alt": "A batch page: the batch's mode, model, progress by line, settled cost and holds, and links to its encrypted output and error files.",
+    "alt": "A batch page: the running batch's mode, model, key and input file, its scheduling, line outcomes, progress by line, and cost so far with the amount on hold.",
     "caption": "Batches for any model: on the provider's batch API where it has one, otherwise run line by line by the gateway."
   }
 }

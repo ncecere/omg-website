@@ -1,1 +1,42 @@
-{}
+{
+  "admin-usage": {
+    "src": "/images/admin-usage.webp",
+    "width": 1440,
+    "height": 900
+  },
+  "admin-limits": {
+    "src": "/images/admin-limits.webp",
+    "width": 1440,
+    "height": 900
+  },
+  "workspace-models": {
+    "src": "/images/workspace-models.webp",
+    "width": 1440,
+    "height": 900
+  },
+  "workspace-keys": {
+    "src": "/images/workspace-keys.webp",
+    "width": 1440,
+    "height": 900
+  },
+  "workspace-logs": {
+    "src": "/images/workspace-logs.webp",
+    "width": 1440,
+    "height": 900
+  },
+  "admin-connections": {
+    "src": "/images/admin-connections.webp",
+    "width": 1440,
+    "height": 900
+  },
+  "admin-key-safety": {
+    "src": "/images/admin-key-safety.webp",
+    "width": 1440,
+    "height": 900
+  },
+  "batch-detail": {
+    "src": "/images/batch-detail.webp",
+    "width": 1440,
+    "height": 1200
+  }
+}
