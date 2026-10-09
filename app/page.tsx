@@ -5,7 +5,7 @@ import { ButtonLink, CheckList, CodeBlock, Eyebrow, Note, SectionHeading, Strong
 import { site } from "@/lib/site";
 
 /*
- * Every claim here is checked against Open Model Gateway v0.3.1 (tag v0.3.1 of
+ * Every claim here is checked against Open Model Gateway v0.3.2 (tag v0.3.2 of
  * github.com/ncecere/open-model-gateway): README.md, docs/roadmap.md,
  * docs/architecture.md and the feature docs in docs/. Keep it that way.
  */
