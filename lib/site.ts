@@ -1,5 +1,5 @@
 const repoUrl = "https://github.com/ncecere/open-model-gateway";
-const tag = `${repoUrl}/blob/v0.3.0`;
+const tag = `${repoUrl}/blob/v0.3.1`;
 
 export const site = {
   name: "Open Model Gateway",
@@ -12,11 +12,11 @@ export const site = {
     "Open Model Gateway (OMG) is a self-hosted, open-source gateway that puts cloud and self-hosted AI models behind one API, with workspaces, stacked budgets, exact cost accounting, single sign-on and audit.",
   docsUrl: "https://docs.omg.bitop.dev",
   repoUrl,
-  version: "v0.3.0",
+  version: "v0.3.1",
   // The release day of `version` (the footer and the sitemap show it). Null
-  // until the tag exists; set it the day v0.3.0 is tagged.
+  // until the tag exists; set it the day the release is tagged.
   releaseDate: "2026-10-09" as string | null,
-  releaseNotesUrl: `${repoUrl}/releases/tag/v0.3.0`,
+  releaseNotesUrl: `${repoUrl}/releases/tag/v0.3.1`,
   releasesUrl: `${repoUrl}/releases`,
   licenseUrl: `${tag}/LICENSE`,
   securityUrl: `${repoUrl}/security`,

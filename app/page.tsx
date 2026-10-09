@@ -5,7 +5,7 @@ import { ButtonLink, CheckList, CodeBlock, Eyebrow, Note, SectionHeading, Strong
 import { site } from "@/lib/site";
 
 /*
- * Every claim here is checked against Open Model Gateway v0.3.0 (main of
+ * Every claim here is checked against Open Model Gateway v0.3.1 (tag v0.3.1 of
  * github.com/ncecere/open-model-gateway): README.md, docs/roadmap.md,
  * docs/architecture.md and the feature docs in docs/. Keep it that way.
  */
@@ -608,8 +608,9 @@ function Operations() {
                 enforces the same budgets.
               </>,
               <>
-                <Strong>A locked-down container:</Strong> non-root, read-only root filesystem, and a separate runtime
-                database role with explicit grants. Prices, the ledger and the audit log are append-only to it.
+                <Strong>A locked-down container:</Strong> a signed, distroless image with no shell, non-root, a
+                read-only root filesystem and a built-in health check, plus a separate runtime database role with
+                explicit grants. Prices, the ledger and the audit log are append-only to it.
               </>,
               <>
                 <Strong>Health and metrics:</Strong> liveness and readiness endpoints, and Prometheus metrics on their
@@ -729,6 +730,11 @@ function SelfHost() {
           <p>
             The repository ships a Compose deployment: PostgreSQL, the gateway and an HTTPS front end, with separate
             database roles and secrets in files. A helper script runs each step.
+          </p>
+          <p>
+            Each release also publishes a signed image to <code>ghcr.io/ncecere/open-model-gateway</code>: distroless,
+            with no shell or package manager, running as a non-root user. Verify it with cosign and set{" "}
+            <code>GATEWAY_IMAGE</code> to its digest instead of building.
           </p>
         </SectionHeading>
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.2fr_1fr]">

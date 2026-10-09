@@ -1,7 +1,7 @@
 {
   "admin-usage": {
     "alt": "Admin › Usage in Open Model Gateway: spend for the month with the amount on hold and a link to requests with unknown cost, requests and tokens, the installation's monthly budget, and spend per day.",
-    "caption": "Usage and costs in exact micro-dollars. Holds and unknown costs are shown as such, never as zero.",
+    "caption": "Costs are counted in exact micro-dollars and shown rounded, with the exact amount on hover. Holds and unknown costs are shown as such, never as zero.",
     "file": "admin-usage-overview"
   },
   "admin-limits": {
@@ -29,7 +29,7 @@
     "caption": "The key safety audit finds keys with no expiry, no limits, an absent holder or no recent use, and offers the fix."
   },
   "batch-detail": {
-    "alt": "A batch page: the running batch's mode, model, key and input file, its scheduling, line outcomes, progress by line, and cost so far with the amount on hold.",
+    "alt": "A batch page: the running batch's mode, model, key and input file, its scheduling, line outcomes, progress by line, and cost so far as a lower bound with the amount on hold.",
     "caption": "Batches for any model: on the provider's batch API where it has one, otherwise run line by line by the gateway."
   }
 }
