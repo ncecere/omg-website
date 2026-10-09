@@ -1,0 +1,109 @@
+@import "tailwindcss";
+/* app/brand.css is shared byte for byte with the docs site; never edit it here alone. */
+@import "./brand.css";
+/* Inter Variable, self-hosted: Next.js copies the font files into _next/static. */
+@import "@fontsource-variable/inter";
+
+/*
+ * Everything below reads the brand only through its Tailwind theme names
+ * (--color-brand-*, via --theme()), never the raw token variables, so a new
+ * brand.css drops in without changes here.
+ */
+
+@layer base {
+  html {
+    background-color: --theme(--color-brand-bg);
+    color: --theme(--color-brand-text);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: --theme(--color-brand-primary-subtle);
+    color: --theme(--color-brand-text);
+  }
+
+  /* One focus style everywhere, like the app: a solid ring (>= 3:1). */
+  :focus-visible {
+    outline: 2px solid --theme(--color-brand-focus);
+    outline-offset: 2px;
+  }
+
+  /* Lock page scroll while a screenshot is enlarged (components/ScreenshotZoom.tsx); the gutter stays, so nothing shifts. */
+  html:has(dialog[data-zoom][open]) {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  :where(p, li, dd, figcaption) code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background-color: --theme(--color-brand-surface-sunken);
+    color: --theme(--color-brand-text);
+    box-shadow: inset 0 0 0 1px --theme(--color-brand-border);
+    overflow-wrap: anywhere;
+  }
+}
+
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 75rem;
+  padding-inline: 1.25rem;
+  @media (width >= 40rem) {
+    padding-inline: 2rem;
+  }
+}
+
+/* The hero's soft glow, from the subtle accent tint. Decorative. */
+@utility hero-glow {
+  background-image: radial-gradient(60rem 30rem at 15% -10%, --theme(--color-brand-primary-subtle), transparent 70%);
+}
+
+/* Diagonal stripes behind a missing screenshot, so a placeholder is never mistaken for a picture. */
+@utility placeholder-stripes {
+  background-image: repeating-linear-gradient(
+    135deg,
+    --theme(--color-brand-surface-sunken) 0 12px,
+    --theme(--color-brand-surface) 12px 24px
+  );
+}

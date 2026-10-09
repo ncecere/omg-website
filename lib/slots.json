@@ -1,0 +1,34 @@
+{
+  "admin-usage": {
+    "alt": "Admin › Usage in Open Model Gateway: spend for the period split into settled cost, active holds and requests with unknown cost, with totals per Team and Project and per model.",
+    "caption": "Usage and costs in exact micro-dollars. Holds and unknown costs are shown as such, never as zero."
+  },
+  "admin-limits": {
+    "alt": "Admin › Settings › Defaults & limits: the installation ceiling and the Personal, Team and Project defaults, each with daily, weekly and monthly budgets, requests and tokens per minute, requests at once, jobs at once and storage.",
+    "caption": "Budgets and limits stack: installation, workspace type, workspace and key. Every layer that applies is enforced."
+  },
+  "workspace-models": {
+    "alt": "Workspace › Models: the models this workspace can use, each with its API name, the protocols it serves and its configured prices.",
+    "caption": "Each workspace sees the models its catalogs and direct assignments allow, and nothing else."
+  },
+  "workspace-keys": {
+    "alt": "Workspace › API keys: the workspace's keys with their holder, models, expiry and last use, and a risk badge on keys the key safety audit flagged.",
+    "caption": "Keys belong to one workspace, carry their own limits and models, and are shown once."
+  },
+  "workspace-logs": {
+    "alt": "Workspace › Logs › Requests: a list of requests with time, model, provider, status, tokens, time to first token and cost, above summary figures for the period.",
+    "caption": "Logs keep request metadata: model, status, tokens, timing and cost. Never prompts or responses."
+  },
+  "admin-connections": {
+    "alt": "Admin › Connections: provider connections for OpenAI, Anthropic, AWS Bedrock, OpenRouter and an approved self-hosted vLLM endpoint, each with its status.",
+    "caption": "Connections hold credential references, never the secrets themselves. Self-hosted endpoints need server-side approval."
+  },
+  "admin-key-safety": {
+    "alt": "Admin › Records › Key safety: High, Medium and Low counts of Team and Project keys that need attention, a count of personal keys, and one row per flagged key with its findings and a fix.",
+    "caption": "The key safety audit finds keys with no expiry, no limits, an absent holder or no recent use, and offers the fix."
+  },
+  "batch-detail": {
+    "alt": "A batch page: the batch's mode, model, progress by line, settled cost and holds, and links to its encrypted output and error files.",
+    "caption": "Batches for any model: on the provider's batch API where it has one, otherwise run line by line by the gateway."
+  }
+}

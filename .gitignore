@@ -1,0 +1,12 @@
+node_modules/
+.next/
+out/
+build/
+next-env.d.ts
+*.tsbuildinfo
+.DS_Store
+npm-debug.log*
+.env*
+# Review screenshots of the page itself, not for committing.
+.review/
+.checks/

@@ -1,0 +1,7 @@
+{
+  "_comment": "The Open Model Gateway mark, \"Portal\", from ../omg-assets/logo/portal/ (inner SVG markup on the 64 grid). `svg` is mark-small.svg, the drawing for 20 to 47 px, used by components/logo.tsx (28 px, header and footer); `svgRegular` is mark.svg, the drawing for 48 px and up, used by scripts/og-image.mjs for the Open Graph card. If the logo changes, copy both again, run `npm run og`, and commit.",
+  "placeholder": false,
+  "viewBox": "0 0 64 64",
+  "svg": "<rect width=\"64\" height=\"64\" rx=\"14\" fill=\"#161a22\"/><path d=\"M11.5 32A20.5 20.5 0 1 0 52.5 32A20.5 20.5 0 1 0 11.5 32ZM19.6 30.4A14 14 0 1 0 47.6 30.4A14 14 0 1 0 19.6 30.4Z\" fill=\"#f7f8fa\" fill-rule=\"evenodd\"/><path d=\"M25.2 28.8A10 10 0 1 0 45.2 28.8A10 10 0 1 0 25.2 28.8ZM30.05 27.7A6.25 6.25 0 1 0 42.55 27.7A6.25 6.25 0 1 0 30.05 27.7Z\" fill=\"#f7f8fa\" fill-rule=\"evenodd\"/><circle cx=\"37.1\" cy=\"26.9\" r=\"3.25\" fill=\"#7f86f2\"/>",
+  "svgRegular": "<rect width=\"64\" height=\"64\" rx=\"14\" fill=\"#161a22\"/><path d=\"M12 32A20 20 0 1 0 52 32A20 20 0 1 0 12 32ZM19 30.5A14.5 14.5 0 1 0 48 30.5A14.5 14.5 0 1 0 19 30.5Z\" fill=\"#f7f8fa\" fill-rule=\"evenodd\"/><path d=\"M24.5 29A10.5 10.5 0 1 0 45.5 29A10.5 10.5 0 1 0 24.5 29ZM29.7 27.8A6.5 6.5 0 1 0 42.7 27.8A6.5 6.5 0 1 0 29.7 27.8Z\" fill=\"#f7f8fa\" fill-rule=\"evenodd\"/><circle cx=\"37\" cy=\"27\" r=\"3.5\" fill=\"#7f86f2\"/>"
+}
