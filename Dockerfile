@@ -1,6 +1,6 @@
 # Build the static export once on the build platform (the output is the same
 # for every architecture), then copy it into a multi-arch nginx image.
-FROM --platform=$BUILDPLATFORM docker.io/library/node:22.23.3-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS build
+FROM --platform=$BUILDPLATFORM docker.io/library/node:26.10.0-alpine@sha256:0b36e8c136b94cd4fcf02188228e76c31ad5872eef3fec8cbd2eee500cfd9e80 AS build
 WORKDIR /src
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY package.json package-lock.json ./
@@ -8,7 +8,7 @@ RUN npm ci --no-audit --no-fund
 COPY . .
 RUN npm run build
 
-FROM docker.io/library/nginx:1.29.8-alpine@sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e59193904b198d9b830de
+FROM docker.io/library/nginx:1.31.0-alpine@sha256:2f07d83bf561b506400dc183b1b2003803e39efbd22451f848adaba14d28c7c7
 
 LABEL org.opencontainers.image.source="https://github.com/ncecere/omg-website" \
       org.opencontainers.image.description="The Open Model Gateway website (omg.bitop.dev)" \
