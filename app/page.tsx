@@ -5,9 +5,12 @@ import { ButtonLink, CheckList, CodeBlock, Eyebrow, Note, SectionHeading, Strong
 import { site } from "@/lib/site";
 
 /*
- * Every claim here is checked against Open Model Gateway v0.3.2 (tag v0.3.2 of
+ * Every claim here is checked against Open Model Gateway v0.4.0 (tag v0.4.0 of
  * github.com/ncecere/open-model-gateway): README.md, docs/roadmap.md,
- * docs/architecture.md and the feature docs in docs/. Keep it that way.
+ * docs/architecture.md, docs/kubernetes.md and the feature docs in docs/.
+ * Keep it that way. No capacity/throughput numbers belong on this page: the
+ * release notes' laptop load-test figures are explicitly not a capacity
+ * promise, pending a homelab cluster test.
  */
 
 export default function Home() {
@@ -407,6 +410,36 @@ function Features() {
             ]}
           />
 
+          {/* Scale: docs/kubernetes.md, scaling.md, releases/v0.4.0.md */}
+          <FeatureCard
+            id="feature-scale"
+            icon={<Layers className="size-5" />}
+            eyebrow="Scale-out"
+            title="Add replicas as load grows"
+            lead={
+              <p>
+                Scoped admission locks a workspace&apos;s and a key&apos;s own budget rows instead of one
+                installation-wide row, so replicas of different workspaces run in parallel. Monthly history
+                partitions, hourly usage rollups and operator archival keep old requests from slowing down new ones.
+              </p>
+            }
+            bullets={[
+              <>
+                <Strong>A Kubernetes Helm chart (beta)</Strong> deploys the gateway with an explicit migration job, a
+                hardened non-root Deployment, and an optional CloudNativePG-managed PostgreSQL cluster and pooler.
+              </>,
+              <>
+                <Strong>Per-replica caches</Strong> stay current within about a second through PostgreSQL
+                <code> LISTEN</code>/<code>NOTIFY</code>, while admission always re-checks authorization live.
+              </>,
+              <>
+                <Strong>An admission-ceiling alert</Strong> tells platform admins when one workspace or key, not the
+                installation as a whole, is nearing the request rate a single scope can sustain.
+              </>,
+            ]}
+            note={<>Every number behind this work is a laptop load-test stack, not a capacity promise. See the Kubernetes docs for what is validated so far.</>}
+          />
+
           {/* Workspaces: docs/architecture.md, enterprise-rebuild.md, enterprise-costs.md */}
           <FeatureCard
             id="feature-workspaces"
@@ -446,9 +479,10 @@ function Features() {
             wide
             lead={
               <p>
-                Budgets and limits apply at every layer at once: the installation, the workspace type&apos;s defaults
-                (or a platform override for one workspace), the workspace itself and each key. Whichever runs out first
-                stops the request, before it reaches the provider.
+                Budgets and limits apply at every layer at once: the workspace type&apos;s defaults, a platform
+                override for one workspace, the workspace itself and each key. Whichever runs out first stops the
+                request, before it reaches the provider. An optional, non-blocking installation spend alert watches
+                total spend across every workspace and only notifies &mdash; it never denies a request.
               </p>
             }
             bullets={[
@@ -500,8 +534,8 @@ function Features() {
                 kept apart, and CSV export.
               </>,
               <>
-                <Strong>Alerts</Strong> for budget thresholds, spend spikes, error rates, failing connections and failed
-                or stalled batches, in the app and by email.
+                <Strong>Alerts</Strong> for budget thresholds, spend spikes, error rates, failing connections, an
+                admission ceiling, installation spend, and failed or stalled batches, in the app and by email.
               </>,
               <>
                 <Strong>Key safety</Strong> finds keys with no expiry, no limits, a holder who has left, or no recent
@@ -622,14 +656,15 @@ function Operations() {
               </>,
               <>
                 <Strong>Load-tested</Strong> with a harness in the repository that checks the ledger to the
-                micro-dollar after every run.
+                micro-dollar after every run, including a multi-replica stack behind PgBouncer.
               </>,
             ]}
           />
           <Note>
-            Admission and settlement serialise on one installation lock, so throughput is shared by all replicas:
-            about 115 to 150 requests per second in the published laptop test. Backups are not encrypted by the script;
-            encrypt them before they leave the host.
+            Admission locks a workspace&apos;s and a key&apos;s own budget rows, not an installation-wide row, so
+            replicas of different workspaces run in parallel; one workspace or key still serializes its own requests
+            on purpose, to keep its budgets exact. Backups are not encrypted by the script; encrypt them before they
+            leave the host.
           </Note>
         </div>
         <div className="min-w-0 space-y-6">
@@ -831,7 +866,8 @@ function OpenSource() {
               <p>
                 The features on this page are implemented and tested with mocks and real PostgreSQL. Live acceptance
                 with real identity providers, providers and production load is still open, so pilot it before you
-                depend on it.
+                depend on it. The Kubernetes Helm chart is beta: validated by template rendering, schema checks and
+                a dry run against a live database operator, not yet by sustained production load.
               </p>
               <p>
                 Planned, not built yet: image input, token-by-token Responses and Messages streaming, a video provider,
