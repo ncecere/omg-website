@@ -1,11 +1,11 @@
 {
   "admin-usage": {
-    "alt": "Admin › Usage in Open Model Gateway: spend for the month with the amount on hold and a link to requests with unknown cost, requests and tokens, the installation's monthly budget, and spend per day.",
+    "alt": "Admin › Usage in Open Model Gateway: spend for the month with the amount on hold and a link to requests with unknown cost, requests and tokens, and spend per day.",
     "caption": "Costs are counted in exact micro-dollars and shown rounded, with the exact amount on hover. Holds and unknown costs are shown as such, never as zero.",
     "file": "admin-usage-overview"
   },
   "admin-limits": {
-    "alt": "Admin › Settings › Defaults & limits, Team default: requests and tokens per minute, requests at once, jobs at once, storage and a monthly budget, with tabs for the installation ceiling and the Personal and Project defaults.",
+    "alt": "Admin › Settings › Defaults & limits, Team default: requests and tokens per minute, requests at once, jobs at once, storage and a monthly budget, with tabs for the Personal and Project defaults.",
     "caption": "Budgets and limits stack: workspace type, platform override, workspace and key. Every layer that applies is enforced."
   },
   "workspace-models": {
