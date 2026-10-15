@@ -6,7 +6,7 @@
   },
   "admin-limits": {
     "alt": "Admin › Settings › Defaults & limits, Team default: requests and tokens per minute, requests at once, jobs at once, storage and a monthly budget, with tabs for the installation ceiling and the Personal and Project defaults.",
-    "caption": "Budgets and limits stack: installation, workspace type, workspace and key. Every layer that applies is enforced."
+    "caption": "Budgets and limits stack: workspace type, platform override, workspace and key. Every layer that applies is enforced."
   },
   "workspace-models": {
     "alt": "Workspace › Models: the models this workspace can use, each with its API name, type, serving state and configured prices, two of them ticked for comparison.",

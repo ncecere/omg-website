@@ -5,12 +5,13 @@ import { ButtonLink, CheckList, CodeBlock, Eyebrow, Note, SectionHeading, Strong
 import { site } from "@/lib/site";
 
 /*
- * Every claim here is checked against Open Model Gateway v0.4.0 (tag v0.4.0 of
+ * Every claim here is checked against Open Model Gateway v0.6.0 (tag v0.6.0 of
  * github.com/ncecere/open-model-gateway): README.md, docs/roadmap.md,
- * docs/architecture.md, docs/kubernetes.md and the feature docs in docs/.
- * Keep it that way. No capacity/throughput numbers belong on this page: the
- * release notes' laptop load-test figures are explicitly not a capacity
- * promise, pending a homelab cluster test.
+ * docs/architecture.md, docs/kubernetes.md, docs/operations.md,
+ * docs/threat-model.md, docs/releases/v0.5.0.md and v0.6.0.md, and the feature
+ * docs in docs/. Keep it that way. No capacity/throughput numbers belong on
+ * this page: the release notes say there is no certified capacity number yet
+ * (steady-load stalls, #132, and a failover write outage, #149, are open).
  */
 
 export default function Home() {
@@ -331,6 +332,10 @@ function Features() {
                 <CheckList
                   items={[
                     <>
+                      <Strong>Streaming everywhere it matters:</Strong> Chat Completions, Responses and Anthropic
+                      Messages send text to the client as the model writes it.
+                    </>,
+                    <>
                       <Strong>Realtime audio</Strong> sessions over WebSocket, with the budget reserved and settled
                       per response.
                     </>,
@@ -346,8 +351,8 @@ function Features() {
                   ]}
                 />
                 <Note>
-                  Each endpoint supports a documented subset of its protocol. In this release, Responses and Messages
-                  streams arrive in one piece rather than token by token, and there is no image input yet.
+                  Each endpoint supports a documented subset of its protocol. Responses and Messages stream text as
+                  it&apos;s generated, but deliver tool calls whole, after the text. There is no image input yet.
                 </Note>
               </div>
               <div className="min-w-0 self-start overflow-x-auto rounded-card border border-brand-border-emphasis bg-brand-surface-sunken">
@@ -410,7 +415,7 @@ function Features() {
             ]}
           />
 
-          {/* Scale: docs/kubernetes.md, scaling.md, releases/v0.4.0.md */}
+          {/* Scale: docs/kubernetes.md, postgresql-ha.md, releases/v0.4.0.md, v0.5.0.md, v0.6.0.md */}
           <FeatureCard
             id="feature-scale"
             icon={<Layers className="size-5" />}
@@ -425,8 +430,18 @@ function Features() {
             }
             bullets={[
               <>
-                <Strong>A Kubernetes Helm chart (beta)</Strong> deploys the gateway with an explicit migration job, a
-                hardened non-root Deployment, and an optional CloudNativePG-managed PostgreSQL cluster and pooler.
+                <Strong>A one-step Kubernetes install (beta).</Strong> One <code>helm install</code> brings up the
+                gateway, an optional CloudNativePG-managed PostgreSQL cluster and pooler, and the schema: the migration
+                job waits for the database, and gateway pods wait for the schema instead of crash-looping.
+              </>,
+              <>
+                <Strong>A dashboard that stays fast at scale.</Strong> With tens of thousands of users, workspaces
+                and keys, admin lists page and search on the server, and one slow list never holds up other requests.
+              </>,
+              <>
+                <Strong>Failover without losing track of money.</Strong> Tested on a multi-node cluster with a
+                CloudNativePG primary and standby: through gateway kills, cut streams and database failovers,
+                interrupted requests kept their holds and nothing was charged twice.
               </>,
               <>
                 <Strong>Per-replica caches</Strong> stay current within about a second through PostgreSQL
@@ -437,7 +452,7 @@ function Features() {
                 installation as a whole, is nearing the request rate a single scope can sustain.
               </>,
             ]}
-            note={<>Every number behind this work is a laptop load-test stack, not a capacity promise. See the Kubernetes docs for what is validated so far.</>}
+            note={<>There is no certified capacity number yet: steady-load stalls are still being investigated, and the chart&apos;s default database size is too small for real load. See the Kubernetes docs for what is validated so far.</>}
           />
 
           {/* Workspaces: docs/architecture.md, enterprise-rebuild.md, enterprise-costs.md */}
@@ -568,7 +583,77 @@ function Features() {
                 <Strong>Auditors</Strong> can open every admin page and change nothing.
               </>,
               <>
-                <Strong>An audit log</Strong> records every administrative change, without credentials.
+                <Strong>Sign-in limits and sessions:</Strong> sign-in is rate-limited per address, dashboard
+                sessions end after an idle and an absolute limit, and people can see and end their own sessions.
+                Admins can sign someone out everywhere.
+              </>,
+              <>
+                <Strong>An audit log</Strong> records every administrative change, without credentials, and can
+                stream to your SIEM: a signed HTTPS webhook, syslog over TLS or OpenTelemetry (OTLP) logs. Every
+                event is numbered, so the receiver can spot a lost event or a silent export.
+              </>,
+            ]}
+          />
+
+          {/* Security: docs/operations.md (Outbound connections), threat-model.md, releases/v0.6.0.md */}
+          <FeatureCard
+            id="feature-security"
+            icon={<Shield className="size-5" />}
+            eyebrow="Security"
+            title="Locked down by default, with the threats written down"
+            lead={
+              <p>
+                The v0.6.0 security release adds controls on where the gateway may connect, how people sign in, and
+                what can be undone by hand.
+              </p>
+            }
+            bullets={[
+              <>
+                <Strong>One outbound address policy</Strong> for providers, sign-in, storage, email and audit
+                export: cloud metadata and reserved addresses are always refused, private networks only when you
+                list them.
+              </>,
+              <>
+                <Strong>Security headers</Strong> on every response: the dashboard can&apos;t be framed and runs
+                only its own scripts.
+              </>,
+              <>
+                <Strong>Revocations are final</Strong> in the database itself, and a restore can reapply every
+                revocation made after the backup.
+              </>,
+              <>
+                <Strong>A published threat model</Strong> maps each threat to the code and tests that address it,
+                and lists what is still open.
+              </>,
+            ]}
+          />
+
+          {/* Data controls: docs/settings.md (retention), identity.md (cleanup), releases/v0.6.0.md */}
+          <FeatureCard
+            id="feature-data-controls"
+            icon={<Scale className="size-5" />}
+            eyebrow="Data controls"
+            title="Answer for people's data"
+            lead={
+              <p>
+                For data-protection requests and investigations, without giving anyone more access than they
+                already have.
+              </p>
+            }
+            bullets={[
+              <>
+                <Strong>Download your data:</Strong> anyone can export their own record as one file; admins can
+                export what admins already see about a person.
+              </>,
+              <>
+                <Strong>Remove personal data now</Strong> for a suspended person, instead of waiting for the
+                scheduled cleanup.
+              </>,
+              <>
+                <Strong>Legal holds</Strong> stop all removal for a person or a team while they are in place.
+              </>,
+              <>
+                <Strong>A documented retention period</Strong> for every kind of data, and what removes it.
               </>,
             ]}
           />
@@ -590,6 +675,11 @@ function Features() {
               <>
                 <Strong>Files are encrypted</Strong> by the gateway before they reach disk or S3-compatible storage,
                 each with its own key. File storage is off until you turn it on, with retention per kind of file.
+                Master keys can be rotated and retired while the gateway serves.
+              </>,
+              <>
+                <Strong>Files, batches and videos are per user</Strong> in Teams and Projects by default: a
+                member&apos;s keys see only what that member created, unless the workspace chooses to share them.
               </>,
               <>
                 <Strong>Provider credentials</Strong> are references to server-side secrets or workload identity, never
@@ -615,14 +705,17 @@ function Features() {
 const opsExample = `# explicit, checked migrations: serve never migrates
 open-model-gateway migrate
 
+# reapply the runtime role's grants after every migrate
+open-model-gateway grants apply
+
 # compare maintained budget totals with a full scan
 open-model-gateway budget verify
 
-# find missing or undecryptable files
-open-model-gateway files verify
+# retire an old file-store master key, while serving
+open-model-gateway files rekey --from k2026a --to k2027a
 
-# checksummed backup, schema lineage recorded
-python3 scripts/backup.py backup --out-dir /secure/backups`;
+# encrypted as it's taken; "upload" copies it off the host
+python3 scripts/backup.py backup --out-dir /secure/backups --encrypt-to age1...`;
 
 function Operations() {
   return (
@@ -652,19 +745,20 @@ function Operations() {
               </>,
               <>
                 <Strong>Backups</Strong> with checksums, lineage checks and restores only into an empty database. Never
-                over live data.
+                over live data. They can be encrypted as they&apos;re taken and copied to S3-compatible storage off
+                the host.
               </>,
               <>
                 <Strong>Load-tested</Strong> with a harness in the repository that checks the ledger to the
-                micro-dollar after every run, including a multi-replica stack behind PgBouncer.
+                micro-dollar after every run, on a multi-replica stack behind PgBouncer and on a multi-node
+                Kubernetes cluster through database failovers.
               </>,
             ]}
           />
           <Note>
             Admission locks a workspace&apos;s and a key&apos;s own budget rows, not an installation-wide row, so
             replicas of different workspaces run in parallel; one workspace or key still serializes its own requests
-            on purpose, to keep its budgets exact. Backups are not encrypted by the script; encrypt them before they
-            leave the host.
+            on purpose, to keep its budgets exact. Backups are logical dumps, not point-in-time recovery.
           </Note>
         </div>
         <div className="min-w-0 space-y-6">
@@ -771,6 +865,10 @@ function SelfHost() {
             with no shell or package manager, running as a non-root user. Verify it with cosign and set{" "}
             <code>GATEWAY_IMAGE</code> to its digest instead of building.
           </p>
+          <p>
+            On Kubernetes, the Helm chart (beta) installs the gateway, an optional CloudNativePG database and the
+            schema with one <code>helm install</code>.
+          </p>
         </SectionHeading>
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
           <div className="min-w-0 space-y-6">
@@ -864,14 +962,20 @@ function OpenSource() {
             </h3>
             <div className="mt-4 space-y-3 leading-relaxed text-brand-muted">
               <p>
-                The features on this page are implemented and tested with mocks and real PostgreSQL. Live acceptance
-                with real identity providers, providers and production load is still open, so pilot it before you
-                depend on it. The Kubernetes Helm chart is beta: validated by template rendering, schema checks and
-                a dry run against a live database operator, not yet by sustained production load.
+                The features on this page are implemented and tested with mocks and real PostgreSQL. It is development
+                software: live acceptance with real identity providers and providers, an independent security review
+                and a certified capacity number are still open, so pilot it before you depend on it. The Kubernetes
+                Helm chart is beta: tested on a multi-node cluster with database failover, not yet under sustained
+                production load.
               </p>
               <p>
-                Planned, not built yet: image input, token-by-token Responses and Messages streaming, a video provider,
-                active health checks, webhooks and reconciliation against provider invoices.
+                New since v0.4.0: streaming Responses and Messages, a dashboard that stays fast at scale, encrypted
+                off-host backups, a one-step Helm install, and a security release with an outbound address policy,
+                sign-in limits and sessions, audit export to a SIEM, data controls and file-store key rotation.
+              </p>
+              <p>
+                Planned, not built yet: image input, content guardrails (designed), a video provider, active health
+                checks, notification webhooks and reconciliation against provider invoices.
               </p>
             </div>
             <p className="mt-6 text-brand-muted">
