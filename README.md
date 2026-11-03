@@ -2,9 +2,11 @@
 
 The landing page for [Open Model Gateway (OMG)](https://github.com/ncecere/open-model-gateway), a self-hosted, open-source (MIT) gateway that puts cloud and self-hosted AI models behind one OpenAI- and Anthropic-compatible API, with workspaces, stacked budgets, exact cost accounting, single sign-on and audit. The site is served at https://omg.bitop.dev; the documentation lives in its own repository and site, https://docs.omg.bitop.dev.
 
-It's one long page plus a 404 page, with no pricing, sign-up, forms, cookies, tracking or third-party requests. The text describes OMG **v0.3.0** (the current `main` of the gateway repository) and is checked against its README, `docs/roadmap.md`, `docs/architecture.md` and the feature docs in `docs/`. `lib/site.ts` holds the version, the release day (`null` until the tag exists; set it when v0.3.0 is tagged, and the footer and sitemap show it) and the release links.
+It's one long page plus a 404 page, with no pricing, sign-up, forms, cookies, tracking or third-party requests. The text describes OMG **v0.10.0** (released 2026-11-02, tag `v0.10.0` of the gateway repository) and is checked against that tag's README, `CHANGELOG.md`, `docs/roadmap.md`, `docs/architecture.md`, `docs/releases/` and the feature docs in `docs/`, with UI names from `apps/web/src`. Only shipped behaviour is described as shipped; planned work appears only as planned, as `docs/roadmap.md` lists it.
 
-One claim depends on work that was not merged when the page was written: capacity-aware batch scheduling for self-hosted models (migration `0022_batch_scheduling.sql`). It is marked `// verify after merge` in `app/page.tsx`; check it against `docs/batches.md` once merged, and remove the bullet if it changed or was dropped.
+`lib/site.ts` holds the version, the release day (`null` until the tag exists; the footer and sitemap show it), the version the "What's new" section counts from (`previousVersion`), the release links (GitHub release, changelog, upgrade notes, and the release pages on the docs site), the published image (repository, tag, digest from the release's `open-model-gateway-<tag>.digest.txt` asset, and the cosign certificate identity `.github/workflows/image.yml@refs/tags/<tag>` with the GitHub Actions OIDC issuer) and the repository links, all pinned to the release tag. When moving to a new tag, check that every pinned path exists: `git -C ../open-model-gateway ls-tree -r --name-only <tag>`.
+
+**Sections:** hero, the problem, how it works, features, operations, the dashboard (screenshots), what's new, self-host, and open source and project status. "What's new" is a short **themed** summary of everything since `previousVersion` (four themes, each linking its docs page, plus the breaking changes operators must act on when upgrading), not one card per release: fold a new release into the themes and the feature cards rather than adding to a chain.
 
 **Naming.** The page leads with "Open Model Gateway" (title, hero, metadata) and uses "OMG" only as a short form after it. The text names no competing products; providers the gateway connects to (OpenAI, Anthropic, AWS Bedrock, OpenRouter, vLLM, SGLang, Ollama) are named because they are what it connects to. Examples use generic names (`gateway.example.edu`, `campus/chat`). `scripts/postbuild.mjs` fails the build if a page uses a forbidden name or "OMG" before "Open Model Gateway".
 
@@ -32,7 +34,7 @@ The logo is "Portal": a tunnel seen slightly off-axis, two light bands receding 
 
 ## Screenshots
 
-The page has 8 named screenshot slots in its dashboard section, listed in `lib/slots.json` with their alt text and captions. A slot without an image shows a clearly marked placeholder with the expected file name. All 8 are placeholders until `omg-assets` has captures.
+The page has 8 named screenshot slots in its dashboard section, listed in `lib/slots.json` with their alt text and captions. A slot without an image shows a clearly marked placeholder with the expected file name. The images in `public/images/` were taken on v0.6.0; they are being retaken on v0.10.0 under the same slot names. Alt text was updated from `apps/web/src` at v0.10.0 where the UI changed (`admin-usage`, `admin-limits`, `workspace-keys`, `workspace-logs`); check those against the new captures.
 
 ```sh
 npm run images   # copy the screenshots that exist into public/images as WebP, record their sizes
@@ -43,11 +45,11 @@ Commit the results (`public/images/`, `lib/screenshots.json`, `public/og.png`, i
 
 | Slot | Shows |
 |---|---|
-| `admin-usage` | Admin › Usage: settled, held and unknown cost (also used by `public/og.png`) |
-| `admin-limits` | Admin › Settings › Defaults & limits |
+| `admin-usage` | Admin › Usage & costs, Overview tab: settled, held and unknown cost (also used by `public/og.png`) |
+| `admin-limits` | Admin › Settings › Defaults & limits, including the key issuance rows |
 | `workspace-models` | Workspace › Models |
-| `workspace-keys` | Workspace › API keys, with key safety badges |
-| `workspace-logs` | Workspace › Logs › Requests |
+| `workspace-keys` | Workspace › API keys, with the 24-hour issuance count and key safety badges |
+| `workspace-logs` | Workspace › Logs › Requests, with the Refresh action |
 | `admin-connections` | Admin › Connections |
 | `admin-key-safety` | Admin › Records › Key safety |
 | `batch-detail` | A batch page |

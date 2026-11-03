@@ -5,13 +5,14 @@ import { ButtonLink, CheckList, CodeBlock, Eyebrow, Note, SectionHeading, Strong
 import { site } from "@/lib/site";
 
 /*
- * Every claim here is checked against Open Model Gateway v0.6.0 (tag v0.6.0 of
- * github.com/ncecere/open-model-gateway): README.md, docs/roadmap.md,
- * docs/architecture.md, docs/kubernetes.md, docs/operations.md,
- * docs/threat-model.md, docs/releases/v0.5.0.md and v0.6.0.md, and the feature
- * docs in docs/. Keep it that way. No capacity/throughput numbers belong on
- * this page: the release notes say there is no certified capacity number yet
- * (steady-load stalls, #132, and a failover write outage, #149, are open).
+ * Every claim here is checked against Open Model Gateway v0.10.0 (tag v0.10.0 of
+ * github.com/ncecere/open-model-gateway): README.md, CHANGELOG.md,
+ * docs/roadmap.md, docs/architecture.md, docs/kubernetes.md, docs/operations.md,
+ * docs/protocol-matrix.md, docs/threat-model.md, docs/releases/v0.6.1.md to
+ * v0.10.0.md, and the feature docs in docs/. Keep it that way: shipped behaviour
+ * only, and planned work only as planned (docs/roadmap.md). No capacity or
+ * throughput numbers belong on this page: there is no certified capacity number
+ * yet (steady-load stalls, #132, and failover durability, #149/#391, are open).
  */
 
 export default function Home() {
@@ -23,6 +24,7 @@ export default function Home() {
       <Features />
       <Operations />
       <Screenshots />
+      <WhatsNew />
       <SelfHost />
       <OpenSource />
     </>
@@ -345,14 +347,21 @@ function Features() {
                       are checked first, with a report by line number.
                     </>,
                     <>
+                      <Strong>Claude Code</Strong> works through <code>/v1/messages</code> on native Anthropic
+                      routes, with prompt caching, thinking and images, within a documented subset.
+                    </>,
+                    <>
                       <Strong>Anything unsupported fails clearly.</Strong> Options the gateway can&apos;t honour are
                       rejected, never silently dropped.
                     </>,
                   ]}
                 />
                 <Note>
-                  Each endpoint supports a documented subset of its protocol. Responses and Messages stream text as
-                  it&apos;s generated, but deliver tool calls whole, after the text. There is no image input yet.
+                  Each endpoint supports a documented subset of its protocol, published as an{" "}
+                  <TextLink href={site.inferenceOpenApiUrl}>OpenAPI 3.1 contract</TextLink> that is checked against
+                  the gateway itself. Responses and Messages stream text as it&apos;s
+                  generated, but deliver tool calls whole, after the text. Image input is limited to base64 images on
+                  native Anthropic routes.
                 </Note>
               </div>
               <div className="min-w-0 self-start overflow-x-auto rounded-card border border-brand-border-emphasis bg-brand-surface-sunken">
@@ -406,8 +415,7 @@ function Features() {
                 <Strong>Routing</Strong> by priority and weight, with residency labels and a cooldown for failing
                 deployments. Up to three attempts, only when you allow it, and never after a stream has started.
               </>,
-              // verify after merge: capacity-aware batch scheduling for self-hosted models
-              // (migration 0022_batch_scheduling.sql, docs/batches.md#scheduling-on-self-hosted-models).
+              // docs/batches.md#scheduling-on-self-hosted-models
               <>
                 <Strong>Batches wait for capacity</Strong> on self-hosted models: a per-route limit, yielding to live
                 traffic, an optional server load signal and time window.
@@ -415,7 +423,7 @@ function Features() {
             ]}
           />
 
-          {/* Scale: docs/kubernetes.md, postgresql-ha.md, releases/v0.4.0.md, v0.5.0.md, v0.6.0.md */}
+          {/* Scale: docs/kubernetes.md, postgresql-ha.md, releases/v0.4.0.md, v0.5.0.md, v0.6.0.md, v0.8.0.md, v0.9.3.md */}
           <FeatureCard
             id="feature-scale"
             icon={<Layers className="size-5" />}
@@ -432,16 +440,18 @@ function Features() {
               <>
                 <Strong>A one-step Kubernetes install (beta).</Strong> One <code>helm install</code> brings up the
                 gateway, an optional CloudNativePG-managed PostgreSQL cluster and pooler, and the schema: the migration
-                job waits for the database, and gateway pods wait for the schema instead of crash-looping.
+                job waits for the database, and gateway pods wait for the schema instead of crash-looping. Backups
+                can go through CloudNativePG&apos;s Barman Cloud plugin.
               </>,
               <>
                 <Strong>A dashboard that stays fast at scale.</Strong> With tens of thousands of users, workspaces
                 and keys, admin lists page and search on the server, and one slow list never holds up other requests.
               </>,
               <>
-                <Strong>Failover without losing track of money.</Strong> Tested on a multi-node cluster with a
-                CloudNativePG primary and standby: through gateway kills, cut streams and database failovers,
-                interrupted requests kept their holds and nothing was charged twice.
+                <Strong>Failover without losing track of money, if you choose it.</Strong> An opt-in CloudNativePG
+                policy (three instances, required synchronous commits, failover quorum) lost no acknowledged
+                accounting writes in a measured primary failover, at the cost of writes pausing for about half a
+                minute. The chart&apos;s two-instance default can lose some.
               </>,
               <>
                 <Strong>Per-replica caches</Strong> stay current within about a second through PostgreSQL
@@ -474,7 +484,12 @@ function Features() {
               </>,
               <>
                 <Strong>Keys</Strong> belong to one workspace, are shown once, and can be limited to chosen models.
-                Rotate, disable or revoke them; a revoked key never comes back.
+                Rotate, disable or revoke them; a revoked key never comes back. How many keys a person and a
+                workspace can create or rotate in 24 hours is limited too.
+              </>,
+              <>
+                <Strong>Access requests:</Strong> people can ask to join a Team or Project that is open to requests,
+                and its admins approve or deny.
               </>,
               <>
                 <Strong>Service accounts</Strong> give applications keys that don&apos;t depend on one employee.
@@ -503,7 +518,8 @@ function Features() {
             bullets={[
               <>
                 <Strong>Budgets</Strong> per UTC day, ISO week, month or lifetime, several at once. Lower layers can
-                only tighten; raising a limit never resets what was spent.
+                only tighten; raising a limit never resets what was spent. What&apos;s left is shown per period, and
+                only when the accounting is complete.
               </>,
               <>
                 <Strong>Limits</Strong> on requests and tokens per minute, requests at once, batch and video jobs at
@@ -527,7 +543,7 @@ function Features() {
             }
           />
 
-          {/* Records: docs/dashboard.md, alerts.md, key-safety.md, cost-reporting.md */}
+          {/* Records: docs/dashboard.md, alerts.md, key-safety.md, cost-reporting.md (scheduled reports) */}
           <FeatureCard
             id="feature-records"
             icon={<Scale className="size-5" />}
@@ -550,7 +566,12 @@ function Features() {
               </>,
               <>
                 <Strong>Alerts</Strong> for budget thresholds, spend spikes, error rates, failing connections, an
-                admission ceiling, installation spend, and failed or stalled batches, in the app and by email.
+                admission ceiling, installation spend, failed or stalled batches, keys about to expire and costs left
+                unknown too long: in the app, by email with retries, and for platform alerts to signed webhooks.
+              </>,
+              <>
+                <Strong>Scheduled cost reports</Strong>, weekly or monthly, for the installation, a cost center, a
+                Team or Project, or your own workspace: emailed as a link, with an aggregate CSV.
               </>,
               <>
                 <Strong>Key safety</Strong> finds keys with no expiry, no limits, a holder who has left, or no recent
@@ -573,7 +594,12 @@ function Features() {
             }
             bullets={[
               <>
-                <Strong>Group mappings</Strong> grant platform roles and workspace membership from signed group claims.
+                <Strong>Group mappings</Strong> grant platform roles and workspace membership from signed group
+                claims, with a preview of who gains or loses access before you save.
+              </>,
+              <>
+                <Strong>Admin API tokens</Strong> for scripts: Platform Admins only, scoped, expiring within 90 days,
+                optionally limited to address ranges, and audited.
               </>,
               <>
                 <Strong>SCIM 2.0</Strong> provisioning: a deactivated person loses access and keys at once, and the last
@@ -595,7 +621,7 @@ function Features() {
             ]}
           />
 
-          {/* Security: docs/operations.md (Outbound connections), threat-model.md, releases/v0.6.0.md */}
+          {/* Security: docs/operations.md (Outbound connections, Credential allowlists), threat-model.md, releases/v0.6.0.md, v0.7.0.md */}
           <FeatureCard
             id="feature-security"
             icon={<Shield className="size-5" />}
@@ -603,8 +629,8 @@ function Features() {
             title="Locked down by default, with the threats written down"
             lead={
               <p>
-                The v0.6.0 security release adds controls on where the gateway may connect, how people sign in, and
-                what can be undone by hand.
+                Controls on where the gateway may connect, who may reach each route, how people sign in, and what
+                can be undone by hand.
               </p>
             }
             bullets={[
@@ -612,6 +638,14 @@ function Features() {
                 <Strong>One outbound address policy</Strong> for providers, sign-in, storage, email and audit
                 export: cloud metadata and reserved addresses are always refused, private networks only when you
                 list them.
+              </>,
+              <>
+                <Strong>Every route has an explicit authorization policy;</Strong> a management route without one is
+                denied, even to platform admins.
+              </>,
+              <>
+                <Strong>Gateway-owned secrets stay put:</Strong> names like the database URL can&apos;t be listed as
+                provider or email credentials, and startup refuses if they are.
               </>,
               <>
                 <Strong>Security headers</Strong> on every response: the dashboard can&apos;t be framed and runs
@@ -705,8 +739,9 @@ function Features() {
 const opsExample = `# explicit, checked migrations: serve never migrates
 open-model-gateway migrate
 
-# reapply the runtime role's grants after every migrate
+# reapply the runtime role's grants after every migrate, then check them
 open-model-gateway grants apply
+open-model-gateway grants verify
 
 # compare maintained budget totals with a full scan
 open-model-gateway budget verify
@@ -740,8 +775,9 @@ function Operations() {
                 explicit grants. Prices, the ledger and the audit log are append-only to it.
               </>,
               <>
-                <Strong>Health and metrics:</Strong> liveness and readiness endpoints, and Prometheus metrics on their
-                own listener, with example alert rules and a Grafana dashboard.
+                <Strong>Health and telemetry:</Strong> liveness and readiness endpoints, Prometheus metrics on their
+                own listener with example alert rules and a Grafana dashboard, and opt-in OpenTelemetry traces,
+                metrics and operational logs.
               </>,
               <>
                 <Strong>Backups</Strong> with checksums, lineage checks and restores only into an empty database. Never
@@ -767,6 +803,7 @@ function Operations() {
             <p className="text-sm font-semibold text-brand-text">Upgrades are deliberate</p>
             <ul className="mt-3 space-y-2 text-sm text-brand-muted">
               <li>The service never migrates its own database; readiness fails until the schema matches the binary.</li>
+              <li>Stop every older replica first: old and new versions never share a schema.</li>
               <li>Migrations check the existing schema before changing anything.</li>
               <li>There are no down migrations: roll back by restoring the pre-upgrade backup.</li>
             </ul>
@@ -813,6 +850,141 @@ function Screenshots() {
   );
 }
 
+/* ------------------------------------------------------------ What's new */
+
+/*
+ * A themed summary of everything since site.previousVersion, not one card per
+ * release: on a new release, fold its changes into these themes (and the
+ * feature cards above) and move previousVersion only when the summary is
+ * rewritten. Sources: docs/releases/v0.6.1.md to v0.10.0.md.
+ */
+const docsPage = (path: string) => `${site.docsUrl}/docs/${path}`;
+
+const themes: { icon: ReactNode; title: string; body: ReactNode; href: string; link: string }[] = [
+  {
+    icon: <Wallet className="size-5" />,
+    title: "Alerts, reports and costs",
+    body: (
+      <>
+        Alert email is retried per recipient and shared fairly between workspaces. Reminders go out before a key
+        expires, alerts fire for costs left unknown, and platform alerts can go to HMAC-signed webhooks. Cost
+        reports run on a schedule, a Holds view lists what is still on hold, and platform admins can compare spend
+        with Anthropic&apos;s own cost report (provider-reported costs, not an invoice).
+      </>
+    ),
+    href: docsPage("administration/alerts"),
+    link: "Alerts",
+  },
+  {
+    icon: <Key className="size-5" />,
+    title: "Administration and automation",
+    body: (
+      <>
+        Scoped, expiring, audited admin API tokens for scripts. OpenAPI 3.1 contracts for the whole management API
+        and the supported inference API, checked against real responses. Previews before changing a route or an SSO
+        group mapping, a history of route changes, access requests, and limits on how fast keys can be issued.
+      </>
+    ),
+    href: docsPage("api/management-api"),
+    link: "Management API",
+  },
+  {
+    icon: <Server className="size-5" />,
+    title: "Clients and telemetry",
+    body: (
+      <>
+        Claude Code on native Anthropic routes, with prompt caching, thinking and base64 images. Chat Completions
+        and Responses no longer need an output limit on priced models, embeddings can come back as base64, and SDKs
+        no longer retry permanent refusals. Inference can have its own host name, shown on key and model pages. Opt-in OpenTelemetry traces,
+        metrics and operational logs.
+      </>
+    ),
+    href: docsPage("using/calling-the-api"),
+    link: "Calling the API",
+  },
+  {
+    icon: <Shield className="size-5" />,
+    title: "Hardening and Kubernetes",
+    body: (
+      <>
+        An explicit authorization policy for every route, reserved credential names, a supported Debian 13 runtime
+        with a refreshed trust store, and a runtime database role without temporary tables. The Helm chart adds an
+        opt-in synchronous durability policy, Barman Cloud plugin backups and tighter database permissions on new
+        installs.
+      </>
+    ),
+    href: docsPage("self-hosting/kubernetes"),
+    link: "Kubernetes",
+  },
+];
+
+function WhatsNew() {
+  return (
+    <section id="whats-new" aria-labelledby="whats-new-title" className="scroll-mt-16 border-t border-brand-border py-20 sm:py-24">
+      <div className="container-page">
+        <SectionHeading id="whats-new-title" eyebrow="What's new" title={`What changed since ${site.previousVersion}`}>
+          <p>
+            The releases up to {site.version} add alerts and reports people can act on, administration you can
+            script, and a harder default installation. Each release has its own notes, with the upgrade steps.
+          </p>
+        </SectionHeading>
+        <ul className="mt-12 grid gap-4 md:grid-cols-2">
+          {themes.map((t) => (
+            <li key={t.title} className="flex flex-col rounded-card border border-brand-border bg-brand-surface p-6">
+              <span className="flex size-9 items-center justify-center rounded-md bg-brand-primary-subtle text-brand-primary-subtle-text">
+                {t.icon}
+              </span>
+              <h3 className="mt-4 text-lg font-semibold text-brand-text">{t.title}</h3>
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-brand-muted">{t.body}</p>
+              <p className="mt-4 text-sm">
+                <TextLink href={t.href}>{t.link} docs</TextLink>
+              </p>
+            </li>
+          ))}
+        </ul>
+
+        {/* Breaking changes: releases/v0.7.0.md, v0.8.0.md, v0.9.0.md, v0.9.1.md, v0.10.0.md (Upgrade sections) */}
+        <div className="mt-8 rounded-card border border-brand-border-emphasis bg-brand-surface-sunken p-6 sm:p-8">
+          <h3 className="text-lg font-semibold text-brand-text">Upgrading from {site.previousVersion}</h3>
+          <p className="mt-2 text-sm text-brand-muted">
+            Read each release&apos;s upgrade notes in order. The changes operators most often need to act on:
+          </p>
+          <CheckList
+            columns
+            items={[
+              <>
+                <Strong>Migrations 0049 to 0068.</Strong> Back up, stop every old replica and alert worker, then run{" "}
+                <code>migrate</code>, <code>grants apply</code> and <code>grants verify</code>. There are no down
+                migrations.
+              </>,
+              <>
+                <Strong>Startup refuses more:</Strong> gateway-owned names in the provider or email secret
+                allowlists, and approved local endpoints in special-use address ranges (documentation, benchmarking,
+                AWS IPv6 metadata).
+              </>,
+              <>
+                <Strong>No <code>Authorization</code> header on dashboard requests.</Strong> The management API now
+                refuses one unless it is an admin API token, so remove any your proxy adds.
+              </>,
+              <>
+                <Strong>A new runtime and trust store,</Strong> and no temporary tables for the runtime role: test
+                outbound TLS to private certificate chains, and give the gateway its own database.
+              </>,
+            ]}
+          />
+          <p className="mt-6 text-sm text-brand-muted">
+            <TextLink href={docsPage("self-hosting/upgrades")}>Upgrade guide</TextLink>
+            {" · "}
+            <TextLink href={site.docsReleasesUrl}>Release notes</TextLink>
+            {" · "}
+            <TextLink href={site.changelogUrl}>Changelog</TextLink>
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ------------------------------------------------------------ Self-host */
 
 const quickStart = `git clone https://github.com/ncecere/open-model-gateway.git
@@ -824,10 +996,14 @@ python3 scripts/staging.py migrate  # schema + grants
 python3 scripts/staging.py up       # behind HTTPS
 python3 scripts/staging.py verify`;
 
+const verifyImage = `cosign verify ${site.image.repository}@${site.image.digest} \\
+  --certificate-identity ${site.image.cosignIdentity} \\
+  --certificate-oidc-issuer ${site.image.cosignIssuer}`;
+
 const composeExcerpt = `# deploy/staging/compose.yaml (excerpt)
 services:
-  postgres:
-    image: postgres:17-bookworm
+  postgres:  # PostgreSQL 17, pinned by digest
+    image: \${STAGING_POSTGRES_IMAGE:-mirror.gcr.io/library/postgres@sha256:…}
   gateway:
     image: \${GATEWAY_IMAGE:-open-model-gateway:staging}
     read_only: true
@@ -840,8 +1016,8 @@ services:
       GATEWAY_PUBLIC_URL: \${GATEWAY_PUBLIC_URL:-https://localhost:18443}
       GATEWAY_METRICS_ADDR: \${GATEWAY_METRICS_ADDR:-}
     secrets: [runtime_database_url]
-  ingress:
-    image: caddy:2-alpine`;
+  ingress:  # Caddy, pinned by digest
+    image: \${STAGING_CADDY_IMAGE:-mirror.gcr.io/library/caddy@sha256:…}`;
 
 const requirements = [
   "Docker with Compose v2, Python 3 and curl on the host",
@@ -867,7 +1043,12 @@ function SelfHost() {
           </p>
           <p>
             On Kubernetes, the Helm chart (beta) installs the gateway, an optional CloudNativePG database and the
-            schema with one <code>helm install</code>.
+            schema with one <code>helm install</code>. For production, opt into its synchronous durability policy.
+          </p>
+          <p>
+            If inference has its own host name, set <code>GATEWAY_INFERENCE_BASE_URL</code> (Helm:{" "}
+            <code>gateway.inferenceBaseUrl</code>) and key and model pages show that address. It changes what the
+            dashboard shows, not your ingress.
           </p>
         </SectionHeading>
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
@@ -887,6 +1068,7 @@ function SelfHost() {
                 in a catalog. Nothing is enabled until you do.
               </li>
             </ol>
+            <CodeBlock label={`Verify the ${site.version} image (cosign v3 or newer)`}>{verifyImage}</CodeBlock>
             <CodeBlock label="What the Compose file runs">{composeExcerpt}</CodeBlock>
           </div>
           <div className="self-start rounded-card border border-brand-border bg-brand-surface p-6 sm:p-8">
@@ -910,6 +1092,9 @@ function SelfHost() {
               </ButtonLink>
               <ButtonLink href={site.composeUrl} variant="secondary">
                 Compose file on GitHub
+              </ButtonLink>
+              <ButtonLink href={site.kubernetesUrl} variant="secondary">
+                Helm chart guide
               </ButtonLink>
             </div>
           </div>
@@ -963,23 +1148,25 @@ function OpenSource() {
             <div className="mt-4 space-y-3 leading-relaxed text-brand-muted">
               <p>
                 The features on this page are implemented and tested with mocks and real PostgreSQL. It is development
-                software: live acceptance with real identity providers and providers, an independent security review
-                and a certified capacity number are still open, so pilot it before you depend on it. The Kubernetes
-                Helm chart is beta: tested on a multi-node cluster with database failover, not yet under sustained
-                production load.
+                software: an independent security review, a certified capacity number and wider live acceptance (sign-in
+                and SCIM have been accepted with Authentik only) are still open, so pilot it before you depend on it. The
+                Kubernetes Helm chart is beta: tested on a multi-node cluster with database failover, not yet under
+                sustained production load.
               </p>
               <p>
-                New since v0.4.0: streaming Responses and Messages, a dashboard that stays fast at scale, encrypted
-                off-host backups, a one-step Helm install, and a security release with an outbound address policy,
-                sign-in limits and sessions, audit export to a SIEM, data controls and file-store key rotation.
+                New since {site.previousVersion}: alerts, scheduled reports and cost reconciliation, admin API tokens
+                and OpenAPI contracts, Claude Code and OpenTelemetry support, and hardening.{" "}
+                <TextLink href="#whats-new">See what&apos;s new</TextLink>.
               </p>
               <p>
-                Planned, not built yet: image input, content guardrails (designed), a video provider, active health
-                checks, notification webhooks and reconciliation against provider invoices.
+                Planned, not built yet: content guardrails (designed), image edits and image input beyond native
+                Anthropic routes, active health checks, a video provider, Azure and Google Vertex AI connections,
+                reconciliation with OpenAI&apos;s cost export, and a Terraform provider.
               </p>
             </div>
             <p className="mt-6 text-brand-muted">
-              Read the <TextLink href={site.releaseNotesUrl}>{site.version} release</TextLink> and the{" "}
+              Read the <TextLink href={site.releaseNotesUrl}>{site.version} release</TextLink>, the{" "}
+              <TextLink href={site.docsReleaseUrl}>release notes</TextLink> and the{" "}
               <TextLink href={site.roadmapUrl}>roadmap</TextLink>.
             </p>
           </article>
